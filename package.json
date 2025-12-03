@@ -1,0 +1,65 @@
+{
+  "name": "ControlF",
+  "displayName": "ttt",
+  "description": "",
+  "version": "0.0.1",
+  "type": "module",
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:simpleSidebarView"
+  ],
+  "main": "./src/index.js",
+  "contributes": {
+      "commands": [
+          {
+              "command": "controlf.abrirTela",
+              "title": "controlf: Buscar Arquivos no Servidor"
+          },
+          {
+              "command": "controlf.abrirConfiguracoes",
+              "title": "controlf config: Configurar Servidores de Conexão"
+          }
+      ],
+      "configuration": {
+          "title": "Configurações ControlF",
+          "properties": {
+              "controlf.perfisConexao": {
+                  "type": "array",
+                  "default": [],
+                  "description": "Lista de perfis de conexão com nome do servidor, URL e nome de usuário.",
+                  "items": {
+                      "type": "object",
+                      "properties": {
+                          "id": { "type": "string" },
+                          "nome": { "type": "string" },
+                          "url": { "type": "string" },
+                          "usuario": { "type": "string" }
+                      }
+                  }
+              }
+          }
+      }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test",
+    "build": "vsce package"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.100.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  }
+}
