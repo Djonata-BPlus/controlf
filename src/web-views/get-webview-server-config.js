@@ -1,12 +1,4 @@
-function getNonce() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 32; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-}
-
+import { getNonce } from "../utils/utils.js";
 
 export default function getWebviewConfigContent(initialProfiles = []) {
     const nonce = getNonce();
@@ -155,7 +147,7 @@ export default function getWebviewConfigContent(initialProfiles = []) {
                             <input id="usuario-\${p.id}" type="text" value="\${p.usuario}" data-id="\${p.id}" data-field="usuario">
                         </div>
                         <div class="field-group">
-                            <label for="senha-\${p.id}">Senha (Preencha <b>apenas</b> se for alterar)</label>
+                            <label for="senha-\${p.id}">Senha</label>
                             <input id="senha-\${p.id}" type="password" value="" data-id="\${p.id}" data-field="senha" placeholder="Deixe em branco para manter a senha salva">
                         </div>
                         <div class="button-group">

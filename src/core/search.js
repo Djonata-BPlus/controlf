@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import getWebviewContent from '../web-views/get-webview-search.js';
+import GetWebviewContent from '../web-views/get-webview-search.js';
+import fs from 'node:fs'
 
 export default class Search {
     _context;
@@ -39,7 +40,7 @@ export default class Search {
             return vscode.commands.executeCommand('controlf.abrirConfiguracoes');
         }
         vscode.window.showInformationMessage('Abrindo tela de busca...');
-        this._panel.webview.html = getWebviewContent(this._storedServers);
+        this._panel.webview.html = new GetWebviewContent(this._storedServers).html;
     }
 
     get storedServers()
@@ -115,13 +116,13 @@ export default class Search {
     {
         const params = {
             namespace: encodeURIComponent(message.namespace),
-            tipoArquivo: encodeURIComponent(message.tipo || '*.cls'),
+            tipoArquivo: (message.tipo || '*.cls'),
             sensitiveCase: (message.sensitiveCase ? 1 : 0),
-            searchInGenFilesToo: (tipoArquivo === "*.*" ? 1 : 0), //Para buscar em todos os tipos é preciso deixar como 1.
+            searchInGenFilesToo: (message.tipo === "*.*" ? 1 : 0), //Para buscar em todos os tipos é preciso deixar como 1.
             maxSize: (message.maxSize || 200),
             stringBusca: encodeURIComponent(message.termo)
         }
-        return `${baseUrl}/api/atelier/v2/${params.namespace}/action/search?query=${params.stringBusca}&documents=${params.tipoArquivo}&case=${params.sensitiveCase}&regex=0&gen=${params.searchInGenFilesToo}&max=${params.maxSize}`;
+        return `${baseUrl}/api/atelier/v2/${params.namespace}/action/search?query=${params.stringBusca}&documents=${encodeURIComponent(params.tipoArquivo)}&case=${params.sensitiveCase}&regex=0&gen=${params.searchInGenFilesToo}&max=${params.maxSize}`;
     }
 
     async buscar(message)
@@ -188,6 +189,7 @@ export default class Search {
             const dados = await resposta.json();
             this._panel.webview.postMessage({ comando: 'getNameSpacesRetorno', data: dados?.result?.content?.namespaces });
         } catch (error) {
+            fs.writeFileSync('showerror.txt', error.message)
             vscode.window.showInformationMessage("Houve um erro ao buscar os namespaces");
         }
     }
