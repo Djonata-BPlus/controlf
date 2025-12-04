@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import GetWebviewContent from '../web-views/get-webview-search.js';
 import {getStoredConfigs} from '../utils/utils.js';
-import fs from 'node:fs'
 
 export default class Search {
     _context;
@@ -61,6 +60,10 @@ export default class Search {
 
     getServerConfig(serverId)
     {
+        if(!this._storedServers){
+            this._panel.webview.postMessage({ comando: 'erro', mensagem: 'Erro ao recuperar configuração'});
+            return;
+        }
         const serverConfig = this._storedServers.find(p => p.id === serverId);
         return serverConfig;
     }
@@ -68,7 +71,7 @@ export default class Search {
     isValidConfigServer(serverId)
     {
         if (!serverId) {
-            this._panel.webview.postMessage({ comando: 'erro', mensagem: 'Selecione um servidor de conexão para buscar. isValidConfigServer'+serverId });
+            this._panel.webview.postMessage({ comando: 'erro', mensagem: 'Selecione um servidor de conexão para buscar.'+serverId });
             return false;
         }
     
@@ -122,6 +125,7 @@ export default class Search {
     {
         try {
             const serverId = message.servidorId;
+            this._storedServers = getStoredConfigs();
             if (!this.isValidConfigServer(serverId)) return;
             
             const config = this.getServerConfig(serverId)
@@ -155,7 +159,7 @@ export default class Search {
     {
         try {        
             if (!servidorId) {
-                panel.webview.postMessage({ comando: 'erro', mensagem: 'Selecione um servidor de conexão para buscar.' });
+                this._panel.webview.postMessage({ comando: 'erro', mensagem: 'Selecione um servidor de conexão para buscar.' });
                 return;
             }
             const config = this.getServerConfig(servidorId);
@@ -176,7 +180,6 @@ export default class Search {
             const dados = await resposta.json();
             this._panel.webview.postMessage({ comando: 'getNameSpacesRetorno', data: dados?.result?.content?.namespaces });
         } catch (error) {
-            fs.writeFileSync('showerror.txt', error.message)
             vscode.window.showInformationMessage("Houve um erro ao buscar os namespaces");
         }
     }

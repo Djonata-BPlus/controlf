@@ -1,6 +1,7 @@
 import {getStoredConfigs} from '../utils/utils.js';
 import GetWebViewConfigContent from '../web-views/get-webview-server-config.js';
 import * as vscode from 'vscode';
+import fs from 'node:fs';
 
 export default class Config {
     _command;
@@ -59,18 +60,42 @@ export default class Config {
     async saveServerConfig(configArray)
     {
        try {
-            const configMetaData = [];
-            const configRef = vscode.workspace.getConfiguration();
-            
-            configArray.forEach(async (config)=> {
-                const secretKey = `controlf.senha.${config?.id}`;
-                if (config.senha && (config.senha.trim() !== '')) await context.secrets.store(secretKey, config.senha);
-                configMetaData.push({...config});
-            });
+            const perfisArray = configArray; 
+            const perfisMetaData = [];
+            const config = vscode.workspace.getConfiguration();
+           
+            for (const perfil of perfisArray) {
+                if (perfil.senha && perfil.senha.trim() !== '') {
+                const secretKey = `controlf.senha.${perfil.id}`;
+                await this._context.secrets.store(secretKey, perfil.senha);
+                }
+
+
+                perfisMetaData.push({
+                    id: perfil.id,
+                    nome: perfil.nome,
+                    url: perfil.url,
+                    usuario: perfil.usuario
+                });
+            }
+            fs.writeFileSync("result.txt", JSON.stringify(perfisMetaData));
+           //configArray.forEach(async (config)=> {
+           //    const secretKey = `controlf.senha.${config.id}`;
+           //    if (config.senha && (config.senha.trim() !== '')) await this._context.secrets.store(secretKey, config.senha);
+           //    configMetaData.push({
+           //        id: perfil.id,
+           //        nome: perfil.nome,
+           //        url: perfil.url,
+           //        usuario: perfil.usuario
+           //    });
+           //});
             //salvando nas configurações globais do vscode a nova configuração.
-            await configRef.update('controlf.perfisConexao', configMetaData, vscode.ConfigurationTarget.Global); 
-            vscode.window.showInformationMessage(`Salvos ${configMetaData.length} perfis de conexão.`);
-            this._panel.webview.postMessage({ comando: 'status', mensagem: 'Perfis salvos!' });
+            
+            await config.update('controlf.perfisConexao', perfisMetaData, vscode.ConfigurationTarget.Global);
+            vscode.window.showInformationMessage(`Salvos ${perfisMetaData.length} perfis de conexão.`);
+            if (this._panel?.webview){
+                this._panel.webview.postMessage({ comando: 'status', mensagem: 'Perfis salvos!' });
+            }   
             this._storedServers = getStoredConfigs()
             this.updateSearchServers()
         } catch (error) {
@@ -82,8 +107,8 @@ export default class Config {
     updateSearchServers()
     {
         this._searchRef.storedServers(this._storedServer);
-        vscode.window.showErrorMessage(this._searchRef?.panel?.webview);
         if (this._searchRef?.panel?.webview){
+            vscode.window.showErrorMessage(this._searchRef?.panel?.webview);
             this._searchRef.panel.webview.postMessage({ comando: 'updateSearchServers', data: this._storedServers});
         }
     }
