@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import GetWebviewContent from '../web-views/get-webview-search.js';
+import {getStoredConfigs} from '../utils/utils.js';
 import fs from 'node:fs'
 
 export default class Search {
@@ -24,7 +25,6 @@ export default class Search {
     registerEvents()
     {
         this._panel.webview.onDidReceiveMessage(async (message) => {
-            console.log("servidor id"+message)
             if (message.comando === 'getNameSpaces') this.getNameSpaces(message?.servidorId);
             if (message.comando === 'buscar') this.buscar(message, this._panel, this._context);
             if (message.comando === 'configuracoes') vscode.commands.executeCommand('controlf.abrirConfiguracoes');
@@ -33,20 +33,13 @@ export default class Search {
 
     initWebView()
     {
-        this._storedServers = this.storedServers;
-        console.log("result: "+this.storedServers)
+        this._storedServers = getStoredConfigs();
         if (this._storedServers.length === 0) {
             vscode.window.showWarningMessage('Nenhum servidor de conexão encontrado. Por favor, cadastre um servidor.');
             return vscode.commands.executeCommand('controlf.abrirConfiguracoes');
         }
         vscode.window.showInformationMessage('Abrindo tela de busca...');
         this._panel.webview.html = new GetWebviewContent(this._storedServers).html;
-    }
-
-    get storedServers()
-    {
-        const config = vscode.workspace.getConfiguration();
-        return config.get('controlf.perfisConexao') || [];
     }
 
     createWebView()
@@ -158,19 +151,13 @@ export default class Search {
         }
     }
 
-    get command()
-    {
-        return this._command;
-    }
-
     async getNameSpaces(servidorId)
     {
-        if (!servidorId) {
-            panel.webview.postMessage({ comando: 'erro', mensagem: 'Selecione um servidor de conexão para buscar.' });
-            return;
-        }
-        
         try {        
+            if (!servidorId) {
+                panel.webview.postMessage({ comando: 'erro', mensagem: 'Selecione um servidor de conexão para buscar.' });
+                return;
+            }
             const config = this.getServerConfig(servidorId);
             
             if(!this.isValidConfigServer(servidorId)) return;
@@ -193,4 +180,20 @@ export default class Search {
             vscode.window.showInformationMessage("Houve um erro ao buscar os namespaces");
         }
     }
+    
+    get command()
+    {
+        return this._command;
+    }
+    
+    get panel()
+    {
+        return this._panel;
+    }
+
+    storedServers(storedServers)
+    {
+        this._storedServers = storedServers
+    }
+
 }

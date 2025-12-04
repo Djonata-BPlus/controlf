@@ -56,30 +56,15 @@ export default class GetWebviewSearchContent {
 	{
 		let body = `<body>`
 		body = body + this.main
+		body = body + this.scripts
+		body = body + `</body></html>`;
+		return body
+	}
 
-		body = body + `
-
+	get scripts()
+	{
+		let scripts = `
 			<script nonce="${this._nonce}">
-			
-				function getNameSpaces() {
-					const servidorId = document.getElementById("selecionar-servidores").value;
-					if(!servidorId) return;
-					vscode.postMessage({ comando: 'getNameSpaces', servidorId });
-				}
-
-				function loadStoredServes() {
-					const initialProfilesJson = ${this._initialProfiles};
-				
-					const listaServidores = document.getElementById("selecionar-servidores")
-					let servidores = ""
-					initialProfilesJson.forEach((profile) => {
-						servidores = servidores += \`
-							<option value="\${profile.id}">\${profile.nome}</option>
-						\`;
-					});
-
-					listaServidores.innerHTML = servidores
-				}
 				const vscode = acquireVsCodeApi();
 				const input = document.getElementById('busca');
 				const lista = document.getElementById('resultados');
@@ -93,15 +78,7 @@ export default class GetWebviewSearchContent {
 					document.getElementById('tipoDocumento').value = state.tipo || '*.cls';
 				}
 
-			</script>
-		</body>
-		</html>`;
-		return body
-	}
-
-	get scripts()
-	{
-		let scripts = `<script nonce="${this._nonce}">`;
+		`;
 		scripts = scripts + this.eventListeners
 		scripts = scripts + this.functions
 		scripts = scripts+`</script>`;
@@ -112,12 +89,11 @@ export default class GetWebviewSearchContent {
 	{
 		return `
 			document.addEventListener("DOMContentLoaded", ()=>{
-				loadStoredServes();
+				loadStoredServes(${this._initialProfiles});
 				getNameSpaces()
 			});
 
 			document.getElementById("selecionar-servidores").addEventListener("change", ()=>{
-				resultados
 				getNameSpaces()
 			});
 
@@ -141,7 +117,6 @@ export default class GetWebviewSearchContent {
 
 			window.addEventListener('message', event => {
 				const message = event.data;
-				document.getElementById("result").value = "chamou1"
 				
 				if (message.comando === 'erro') {
 					lista.innerHTML = '<li style="color:red;">Erro: ' + message.mensagem + '</li>';
@@ -181,11 +156,32 @@ export default class GetWebviewSearchContent {
 					document.getElementById("namespaces").innerHTML = namespaces
 				}
 
-				if (message.comando === 'rechargeNamespaces') {
-					document.getElementById("result").value = "chamou"
-					getNameSpaces()
+				if (message.comando === 'updateSearchServers') {
+					loadStoredServes(message?.data)
 				}
 			});
+		`;
+	}
+	get functions()
+	{
+		return `
+			function getNameSpaces() {
+				const servidorId = document.getElementById("selecionar-servidores").value;
+				if(!servidorId) return;
+				vscode.postMessage({ comando: 'getNameSpaces', servidorId });
+			}
+
+			function loadStoredServes(initialProfilesJson) {		
+				const listaServidores = document.getElementById("selecionar-servidores")
+				let servidores = ""
+				initialProfilesJson.forEach((profile) => {
+					servidores = servidores += \`
+						<option value="\${profile.id}">\${profile.nome}</option>
+					\`;
+				});
+
+				listaServidores.innerHTML = servidores
+			}
 		`;
 	}
 
@@ -195,7 +191,6 @@ export default class GetWebviewSearchContent {
 		return `
 			<div class="top-bar">
 				<h2>Buscar arquivos</h2>
-				<h2 id="result">Result</h2>
 				<div>
 					<label for="selecionar-servidores">Selecionar servidor</label>
 					<select id="selecionar-servidores"></select>

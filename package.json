@@ -49,7 +49,7 @@
     "lint": "eslint .",
     "pretest": "npm run lint",
     "test": "vscode-test",
-    "build": "vsce package"
+    "build": "npx vsce package"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

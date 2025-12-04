@@ -1,9 +1,6 @@
 # CONTROLF Extension
 
 
-## Funcionalidades
-
-
 ## Como usar
 
 1. Pressione `Ctrl+Shift+P` no VS Code

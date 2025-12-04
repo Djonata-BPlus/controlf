@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-export function getSavedProfiles() {
+export function getStoredConfigs() {
     const config = vscode.workspace.getConfiguration();
     return config.get('controlf.perfisConexao') || [];
 }

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import Search from './core/search.js';
-import getWebviewConfigContent from './web-views/get-webview-server-config.js';
-import {getSavedProfiles} from './utils/utils.js';
+import Config from './core/config.js';
+import {getStoredConfigs} from './utils/utils.js';
 
 
 function registerConfigCommand(context) {
@@ -17,7 +17,7 @@ function registerConfigCommand(context) {
             }
         );
 
-        const perfisSalvos = getSavedProfiles();
+        const perfisSalvos = getStoredConfigs();
 
         panel.webview.html = getWebviewConfigContent(perfisSalvos);
 
@@ -66,9 +66,10 @@ function registerConfigCommand(context) {
 
 export function activate(context) {
     // Registra os dois comandos
-    const disposableConfig = registerConfigCommand(context);
-    const command =  new Search(context).command
-    const disposableBusca = command;
+    const search =  new Search(context)
+    const disposableBusca = search.command;
+    const config = new Config(context, search)
+    const disposableConfig = config.command;
 
     // Adiciona ambos os comandos às subscriptions
     context.subscriptions.push(disposableConfig);
