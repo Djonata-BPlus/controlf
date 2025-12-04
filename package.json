@@ -4,6 +4,7 @@
   "description": "",
   "version": "0.0.1",
   "type": "module",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.100.0"
   },
