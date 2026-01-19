@@ -1,7 +1,7 @@
 import {getStoredConfigs} from '../utils/utils.js';
 import GetWebViewConfigContent from '../web-views/get-webview-server-config.js';
 import * as vscode from 'vscode';
-import fs from 'node:fs';
+import fs from "node:fs";
 
 export default class Config {
     _command;
@@ -70,7 +70,6 @@ export default class Config {
                 await this._context.secrets.store(secretKey, perfil.senha);
                 }
 
-
                 perfisMetaData.push({
                     id: perfil.id,
                     nome: perfil.nome,
@@ -78,7 +77,7 @@ export default class Config {
                     usuario: perfil.usuario
                 });
             }
-            fs.writeFileSync("result.txt", JSON.stringify(perfisMetaData));
+            fs.writeFileSync("result1.txt", JSON.stringify(perfisMetaData));
            //configArray.forEach(async (config)=> {
            //    const secretKey = `controlf.senha.${config.id}`;
            //    if (config.senha && (config.senha.trim() !== '')) await this._context.secrets.store(secretKey, config.senha);
@@ -99,17 +98,22 @@ export default class Config {
             this._storedServers = getStoredConfigs()
             this.updateSearchServers()
         } catch (error) {
-            vscode.window.showErrorMessage('Erro ao salvar as configurações.');
+            vscode.window.showErrorMessage('Erro ao salvar as configurações.' + error);
             this._panel.webview.postMessage({ comando: 'status', mensagem: `Erro: ${error.message}` });
         }
     }
 
     updateSearchServers()
     {
-        this._searchRef.storedServers(this._storedServer);
-        if (this._searchRef?.panel?.webview){
-            vscode.window.showErrorMessage(this._searchRef?.panel?.webview);
-            this._searchRef.panel.webview.postMessage({ comando: 'updateSearchServers', data: this._storedServers});
+        try{
+            this._searchRef.storedServers();
+            if (this._searchRef?.panel?.webview){
+                vscode.window.showErrorMessage(this._searchRef?.panel?.webview);
+                this._searchRef.panel.webview.postMessage({ comando: 'updateSearchServers', data: this._storedServers});
+            }
+        }catch(error)
+        {
+            vscode.window.showErrorMessage('Erro ao atualizar informações na tela de busca.' + error);
         }
     }
 

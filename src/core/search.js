@@ -131,10 +131,14 @@ export default class Search {
             const config = this.getServerConfig(serverId)
             if (!this.isValidAccess(config)) return;
 
+            if (!message?.namespace){
+                vscode.window.showInformationMessage("Obrigatório informar o namespace.");
+            }
+
             const url = await this.getSearchURL(message, config.url);
             const password = await this.getPassword(config?.id);
             const base64Credentials = Buffer.from(`${config.usuario}:${password}`).toString('base64');
-        
+    
             const resposta = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -151,13 +155,13 @@ export default class Search {
             const dados = await resposta.json();
             this._panel.webview.postMessage({ comando: 'resultado', dados });
         } catch (erro) {
-            this._panel.webview.postMessage({ comando: 'erro', mensagem: `Erro de conexão ou servidor: ${erro.message}` });
+            this._panel.webview.postMessage({ comando: 'erro', mensagem: `Erro de conexão ou servidor: ${erro.message}, url de teste foi ${url}` });
         }
     }
 
     async getNameSpaces(servidorId)
     {
-        try {        
+        try {    
             if (!servidorId) {
                 this._panel.webview.postMessage({ comando: 'erro', mensagem: 'Selecione um servidor de conexão para buscar.' });
                 return;
@@ -180,7 +184,8 @@ export default class Search {
             const dados = await resposta.json();
             this._panel.webview.postMessage({ comando: 'getNameSpacesRetorno', data: dados?.result?.content?.namespaces });
         } catch (error) {
-            vscode.window.showInformationMessage("Houve um erro ao buscar os namespaces");
+            vscode.window.showInformationMessage("Houve um erro ao buscar os namespaces, verifique as configurações.");
+            this._panel.webview.postMessage({ comando: 'getNamespaceError'})
         }
     }
     
@@ -194,9 +199,10 @@ export default class Search {
         return this._panel;
     }
 
-    storedServers(storedServers)
+    storedServers()
     {
-        this._storedServers = storedServers
+        this._storedServers = getStoredConfigs()
+       
     }
 
 }

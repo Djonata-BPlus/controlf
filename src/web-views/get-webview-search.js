@@ -159,9 +159,14 @@ export default class GetWebviewSearchContent {
 				if (message.comando === 'updateSearchServers') {
 					loadStoredServes(message?.data)
 				}
+
+				if (message.comando === 'getNamespaceError') {
+					clearNamespaceField()
+				}
 			});
 		`;
 	}
+
 	get functions()
 	{
 		return `
@@ -171,9 +176,16 @@ export default class GetWebviewSearchContent {
 				vscode.postMessage({ comando: 'getNameSpaces', servidorId });
 			}
 
+			function clearNamespaceField() {
+				document.getElementById("namespaces").length = 0
+			}
+
 			function loadStoredServes(initialProfilesJson) {		
 				const listaServidores = document.getElementById("selecionar-servidores")
 				let servidores = ""
+				//tem que carregar novamente os perfis para não dar erro de referência
+				//mandar um comando para o search e carregar neste initial profiles json
+				//os novos servidores assim evitando de dar erro.
 				initialProfilesJson.forEach((profile) => {
 					servidores = servidores += \`
 						<option value="\${profile.id}">\${profile.nome}</option>

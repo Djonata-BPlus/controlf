@@ -214,7 +214,8 @@ export default class GetWebViewConfigContent {
                 // Envia a lista completa de perfis para o backend (extension.js)
                 function saveAllProfiles() {
                     const profilesToSend = profiles.map(p => {
-                        // Recupera o valor atual do campo de senha (se preenchido)
+                        // Recupera o valor atual do campo de senha (se preenchido), pois podem ter casos em que não precisa
+                        //de senha.
                         const senhaInput = document.getElementById(\`senha-\${p.id}\`);
                         
                         return {
