@@ -24,9 +24,18 @@ export default class Search {
     registerEvents()
     {
         this._panel.webview.onDidReceiveMessage(async (message) => {
-            if (message.comando === 'getNameSpaces') this.getNameSpaces(message?.servidorId);
-            if (message.comando === 'buscar') this.buscar(message, this._panel, this._context);
-            if (message.comando === 'configuracoes') vscode.commands.executeCommand('controlf.abrirConfiguracoes');
+            switch(message.comando)
+            {
+                case 'getNameSpaces':
+                    this.getNameSpaces(message?.servidorId);
+                    break;
+                case 'buscar':
+                    this.buscar(message, this._panel, this._context);
+                    break;
+                case 'configuracoes':
+                    vscode.commands.executeCommand('controlf.abrirConfiguracoes');
+                    break;
+            }
         });
     }
 

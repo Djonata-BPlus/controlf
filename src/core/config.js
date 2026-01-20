@@ -1,7 +1,6 @@
 import {getStoredConfigs} from '../utils/utils.js';
 import GetWebViewConfigContent from '../web-views/get-webview-server-config.js';
 import * as vscode from 'vscode';
-import fs from "node:fs";
 
 export default class Config {
     _command;
@@ -77,18 +76,6 @@ export default class Config {
                     usuario: perfil.usuario
                 });
             }
-            fs.writeFileSync("result1.txt", JSON.stringify(perfisMetaData));
-           //configArray.forEach(async (config)=> {
-           //    const secretKey = `controlf.senha.${config.id}`;
-           //    if (config.senha && (config.senha.trim() !== '')) await this._context.secrets.store(secretKey, config.senha);
-           //    configMetaData.push({
-           //        id: perfil.id,
-           //        nome: perfil.nome,
-           //        url: perfil.url,
-           //        usuario: perfil.usuario
-           //    });
-           //});
-            //salvando nas configurações globais do vscode a nova configuração.
             
             await config.update('controlf.perfisConexao', perfisMetaData, vscode.ConfigurationTarget.Global);
             vscode.window.showInformationMessage(`Salvos ${perfisMetaData.length} perfis de conexão.`);
@@ -98,7 +85,7 @@ export default class Config {
             this._storedServers = getStoredConfigs()
             this.updateSearchServers()
         } catch (error) {
-            vscode.window.showErrorMessage('Erro ao salvar as configurações.' + error);
+            vscode.window.showErrorMessage('Erro ao salvar as configurações.');
             this._panel.webview.postMessage({ comando: 'status', mensagem: `Erro: ${error.message}` });
         }
     }
@@ -113,7 +100,7 @@ export default class Config {
             }
         }catch(error)
         {
-            vscode.window.showErrorMessage('Erro ao atualizar informações na tela de busca.' + error);
+            vscode.window.showErrorMessage('Erro ao atualizar informações na tela de busca.');
         }
     }
 
