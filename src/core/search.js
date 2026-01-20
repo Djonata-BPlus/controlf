@@ -18,10 +18,10 @@ export default class Search {
     {
         this.createWebView()
         this.initWebView()
-        this.registerEvents()
+        this.registerVsCodeEvents()
     }
 
-    registerEvents()
+    registerVsCodeEvents()
     {
         this._panel.webview.onDidReceiveMessage(async (message) => {
             switch(message.comando)

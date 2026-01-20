@@ -65,8 +65,8 @@ export default class Config {
            
             for (const perfil of perfisArray) {
                 if (perfil.senha && perfil.senha.trim() !== '') {
-                const secretKey = `controlf.senha.${perfil.id}`;
-                await this._context.secrets.store(secretKey, perfil.senha);
+                    const secretKey = `controlf.senha.${perfil.id}`;
+                    await this._context.secrets.store(secretKey, perfil.senha);
                 }
 
                 perfisMetaData.push({

@@ -81,7 +81,7 @@ export default class GetWebViewConfigContent {
 
     get body()
     {
-        return `
+        let body = `
             <body>
             <h1>Configuração de Servidores</h1>
 
@@ -92,151 +92,152 @@ export default class GetWebViewConfigContent {
             <button id="save-all-btn">Salvar Todas as Configurações</button>
 
             <p id="status-message" style="color: var(--vscode-terminal-ansiBrightYellow); margin-top: 10px;"></p>
+        `;
 
+        return (body + this.scripts + `</body></html>`);
+    }
+
+    get scripts()
+    {
+        let scripts = `
             <script nonce="${this._nonce}">
                 const vscode = acquireVsCodeApi();
-                // Variável global no frontend para gerenciar a lista de perfis
-                let profiles = ${this._initialProfiles};
+                let profiles = ${this._initialProfiles};`;
+                
+        return (scripts + this.functions + this.eventListeners + `</script>`);
+    }
 
-                document.addEventListener('DOMContentLoaded', () => {
-                    renderProfiles();
-                    
-                    document.getElementById('add-profile-btn').addEventListener('click', () => {
-                        addNewProfile();
-                    });
-                    
-                    document.getElementById('save-all-btn').addEventListener('click', () => {
-                        saveAllProfiles();
-                    });
+    get functions()
+    {
+        return `
+            function generateUniqueId() {
+                return 'controlf-id-' + Math.random().toString(36).substring(2, 9);
+            }
 
-                    // Handler para receber feedback do index
-                    window.addEventListener('message', event => {
-                        const message = event.data;
-                        const statusEl = document.getElementById('status-message');
-                        if (message.comando === 'status') {
-                            statusEl.textContent = 'Status: ' + message.mensagem;
-                            setTimeout(() => statusEl.textContent = '', 5000);
-                        }
-                    });
+            function addNewProfile() {
+                const newProfile = {
+                    id: generateUniqueId(),
+                    nome: 'Novo Servidor',
+                    url: 'http://',
+                    usuario: '',
+                    senha: ''
+                };
+                profiles.push(newProfile);
+                renderProfiles();
+            }
+
+            function removeProfile(id) {
+                profiles = profiles.filter(p => p.id !== id);
+                renderProfiles();
+            }
+
+            // Renderiza toda a lista de cards de servidores
+            function renderProfiles() {
+                const container = document.getElementById('profiles-container');
+                container.innerHTML = ''; 
+
+                if (profiles.length === 0) {
+                    container.innerHTML = '<p>Nenhum servidor configurado. Adicione um para começar.</p>';
+                }
+
+                profiles.forEach((p) => {
+                    const card = document.createElement('div');
+                    card.className = 'profile-card';
+
+                    //Adicionado '\' para não quebrar a sintaxe do código.
+                    card.innerHTML = \`
+                        <h3 id="card-title-\${p.id}">\${p.nome || 'Novo Servidor'}</h3>
+                        
+                        <div class="field-group">
+                            <label for="nome-\${p.id}">Nome do Servidor (Ex: Homologação)</label>
+                            <input id="nome-\${p.id}" type="text" value="\${p.nome}" data-id="\${p.id}" data-field="nome">
+                        </div>
+                        <div class="field-group">
+                            <label for="url-\${p.id}">URL Base (Ex: http://ip:porta)</label>
+                            <input id="url-\${p.id}" type="url" value="\${p.url}" data-id="\${p.id}" data-field="url">
+                        </div>
+                        <div class="field-group">
+                            <label for="usuario-\${p.id}">Usuário</label>
+                            <input id="usuario-\${p.id}" type="text" value="\${p.usuario}" data-id="\${p.id}" data-field="usuario">
+                        </div>
+                        <div class="field-group">
+                            <label for="senha-\${p.id}">Senha</label>
+                            <input id="senha-\${p.id}" type="password" value="" data-id="\${p.id}" data-field="senha" placeholder="Deixe em branco para manter a senha salva">
+                        </div>
+                        <div class="button-group">
+                            <button data-id="\${p.id}" data-action="remove">Remover Perfil</button>
+                        </div>
+                    \`;
+                    container.appendChild(card);
                 });
 
-                // Gerador de ID único simples
-                function generateUniqueId() {
-                    return 'controlf-id-' + Math.random().toString(36).substring(2, 9);
-                }
+                container.querySelectorAll('input').forEach(input => {
+                    input.addEventListener('input', updateServerInfo);
+                });
+                container.querySelectorAll('button[data-action="remove"]').forEach(button => {
+                    button.addEventListener('click', (e) => removeProfile(e.target.dataset.id));
+                });
+            }
 
-                // Adiciona um novo perfil à lista
-                function addNewProfile() {
-                    const newProfile = {
-                        id: generateUniqueId(),
-                        nome: 'Novo Servidor',
-                        url: 'http://',
-                        usuario: '',
-                        senha: ''
-                    };
-                    profiles.push(newProfile);
-                    renderProfiles();
-                }
-
-                // Remove um perfil da lista
-                function removeProfile(id) {
-                    profiles = profiles.filter(p => p.id !== id);
-                    renderProfiles();
-                }
-
-                // Renderiza toda a lista de cards de perfil
-                function renderProfiles() {
-                    const container = document.getElementById('profiles-container');
-                    container.innerHTML = ''; 
-
-                    if (profiles.length === 0) {
-                        container.innerHTML = '<p>Nenhum servidor configurado. Adicione um para começar.</p>';
-                    }
-
-                    profiles.forEach((p) => {
-                        const card = document.createElement('div');
-                        card.className = 'profile-card';
-                        card.innerHTML = \`
-                            <h3 id="card-title-\${p.id}">\${p.nome || 'Novo Servidor'}</h3>
-                            
-                            <div class="field-group">
-                                <label for="nome-\${p.id}">Nome do Servidor (Ex: Homologação)</label>
-                                <input id="nome-\${p.id}" type="text" value="\${p.nome}" data-id="\${p.id}" data-field="nome">
-                            </div>
-                            <div class="field-group">
-                                <label for="url-\${p.id}">URL Base (Ex: http://ip:porta)</label>
-                                <input id="url-\${p.id}" type="url" value="\${p.url}" data-id="\${p.id}" data-field="url">
-                            </div>
-                            <div class="field-group">
-                                <label for="usuario-\${p.id}">Usuário</label>
-                                <input id="usuario-\${p.id}" type="text" value="\${p.usuario}" data-id="\${p.id}" data-field="usuario">
-                            </div>
-                            <div class="field-group">
-                                <label for="senha-\${p.id}">Senha</label>
-                                <input id="senha-\${p.id}" type="password" value="" data-id="\${p.id}" data-field="senha" placeholder="Deixe em branco para manter a senha salva">
-                            </div>
-                            <div class="button-group">
-                                <button data-id="\${p.id}" data-action="remove">Remover Perfil</button>
-                            </div>
-                        \`;
-                        container.appendChild(card);
-                    });
-
-                    // Adiciona listeners para atualizar o modelo de dados ao digitar
-                    container.querySelectorAll('input').forEach(input => {
-                        input.addEventListener('input', updateProfileModel);
-                    });
-                    container.querySelectorAll('button[data-action="remove"]').forEach(button => {
-                        button.addEventListener('click', (e) => removeProfile(e.target.dataset.id));
-                    });
-                }
-
-                // Atualiza o modelo 'profiles' no JavaScript do frontend
-                function updateProfileModel(event) {
-                    const id = event.target.dataset.id;
-                    const field = event.target.dataset.field;
-                    const value = event.target.value;
-                    
-                    const profile = profiles.find(p => p.id === id);
-                    if (profile && field !== 'senha') { 
-                        // Metadados são salvos no modelo JS
-                        profile[field] = value;
-                        
-                        // Atualiza o título do card dinamicamente
-                        if (field === 'nome') {
-                            document.getElementById(\`card-title-\${id}\`).textContent = value;
-                        }
-                    }
-                    // Nota: O campo 'senha' não é salvo no modelo JS aqui; ele é lido diretamente
-                    // do input no momento do 'Salvar' para garantir que não fique em memória do frontend.
-                }
+            function updateServerInfo(event) {
+                const id = event.target.dataset.id;
+                const field = event.target.dataset.field;
+                const value = event.target.value;
                 
-                // Envia a lista completa de perfis para o backend (extension.js)
-                function saveAllProfiles() {
-                    const profilesToSend = profiles.map(p => {
-                        // Recupera o valor atual do campo de senha (se preenchido), pois podem ter casos em que não precisa
-                        //de senha.
-                        const senhaInput = document.getElementById(\`senha-\${p.id}\`);
-                        
-                        return {
-                            id: p.id,
-                            nome: p.nome,
-                            url: p.url,
-                            usuario: p.usuario,
-                            senha: senhaInput ? senhaInput.value : '' 
-                        };
-                    });
+                const profile = profiles.find(p => p.id === id);
+                if (profile && field !== 'senha') { 
+                    profile[field] = value;
                     
-                    // Comunica com o backend, que fará o salvamento no settings.json e SecretStorage
-                    vscode.postMessage({
-                        comando: 'salvarPerfisArray',
-                        perfisArray: profilesToSend
-                    });
+                    if (field === 'nome') {
+                        document.getElementById(\`card-title-\${id}\`).textContent = value;
+                    }
                 }
-            </script>
-        </body>
-        </html>
-    `;
+            }
+            
+            function saveAllProfiles() {
+                const profilesToSend = profiles.map(p => {
+                    const senhaInput = document.getElementById(\`senha-\${p.id}\`);
+                    
+                    return {
+                        id: p.id,
+                        nome: p.nome,
+                        url: p.url,
+                        usuario: p.usuario,
+                        senha: senhaInput ? senhaInput.value : '' 
+                    };
+                });
+                
+                vscode.postMessage({
+                    comando: 'salvarPerfisArray',
+                    perfisArray: profilesToSend
+                });
+        }`;
+    }
+
+    get eventListeners()
+    {
+        return ` 
+            document.addEventListener('DOMContentLoaded', () => {
+                renderProfiles();
+                
+                document.getElementById('add-profile-btn').addEventListener('click', () => {
+                    addNewProfile();
+                });
+                
+                document.getElementById('save-all-btn').addEventListener('click', () => {
+                    saveAllProfiles();
+                });
+
+                window.addEventListener('message', event => {
+                    const message = event.data;
+                    const statusEl = document.getElementById('status-message');
+                    if (message.comando === 'status') {
+                        statusEl.textContent = 'Status: ' + message.mensagem;
+                        setTimeout(() => statusEl.textContent = '', 5000);
+                    }
+                });
+        });
+        `;
     }
    
 }

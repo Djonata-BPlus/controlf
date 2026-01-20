@@ -3,4 +3,5 @@ t2t-0.0.1.vsix
 *.vsix
 *.gitignore
 *.vscodeignore
-.vscode/
+.vscode
+*.test.js
