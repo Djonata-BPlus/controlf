@@ -48,6 +48,18 @@ export default class GetWebviewSearchContent {
 				.checkbox-row { margin-bottom: 8px; }
 				.top-bar {width: 100%; display: flex; flex-flow: row;  justify-content: space-between;}
 				#configuracoes {margin-left: 10px}
+				#botaoBuscar, #configuracoes {
+					background-color: var(--vscode-button-background);
+					color: var(--vscode-button-foreground); 
+                    border: none; 
+                    padding: 10px 15px; 
+                    cursor: pointer; 
+                    margin-right: 10px;
+				}
+				#namespaces, #selecionar-servidores
+				{
+					width: 150px;
+				}
 			</style>
 		</head>`;
 	}
@@ -94,6 +106,7 @@ export default class GetWebviewSearchContent {
 			});
 
 			document.getElementById("selecionar-servidores").addEventListener("change", ()=>{
+				document.getElementById("namespaces").value = null
 				getNameSpaces()
 			});
 
@@ -171,6 +184,7 @@ export default class GetWebviewSearchContent {
 	{
 		return `
 			function getNameSpaces() {
+				clearNamespaceField()
 				const servidorId = document.getElementById("selecionar-servidores").value;
 				if(!servidorId) return;
 				vscode.postMessage({ comando: 'getNameSpaces', servidorId });
@@ -178,14 +192,13 @@ export default class GetWebviewSearchContent {
 
 			function clearNamespaceField() {
 				document.getElementById("namespaces").length = 0
+				lista.innerHTML = ""
 			}
 
 			function loadStoredServes(initialProfilesJson) {		
 				const listaServidores = document.getElementById("selecionar-servidores")
 				let servidores = ""
-				//tem que carregar novamente os perfis para não dar erro de referência
-				//mandar um comando para o search e carregar neste initial profiles json
-				//os novos servidores assim evitando de dar erro.
+				
 				initialProfilesJson.forEach((profile) => {
 					servidores = servidores += \`
 						<option value="\${profile.id}">\${profile.nome}</option>
@@ -193,6 +206,8 @@ export default class GetWebviewSearchContent {
 				});
 
 				listaServidores.innerHTML = servidores
+
+				getNameSpaces()
 			}
 		`;
 	}
@@ -204,11 +219,11 @@ export default class GetWebviewSearchContent {
 			<div class="top-bar">
 				<h2>Buscar arquivos</h2>
 				<div>
-					<label for="selecionar-servidores">Selecionar servidor</label>
+					<label for="selecionar-servidores">SELECIONAR SERVIDOR: </label>
 					<select id="selecionar-servidores"></select>
-					<label for="namespaces">Selecionar o Namespace</label>
+					<label for="namespaces">SELECIONAR NAMESPACE: </label>
 					<select id="namespaces"></select>
-					<button id="configuracoes">Configurações</button>
+					<button id="configuracoes">CONFIGURAÇÕES</button>
 				</div>
 			</div>
 			<div >
@@ -216,21 +231,21 @@ export default class GetWebviewSearchContent {
 				<div id="div-busca">
 					<div class="div-busca-campos">
 						<div>
-							<button id="botaoBuscar">Buscar</button>
+							<button id="botaoBuscar">BUSCAR</button>
 						</div>
 						
 						<div>
-							<label for="tipoDocumento">Tipo de documento:</label>
+							<label for="tipoDocumento">TIPO DE DOCUMENTO</label>
 							<select id="tipoDocumento">
 								<option value="*.cls">.cls</option>
 								<option value="*.*">Todos os tipos</option>
 							</select>
 							<div class="checkbox-row">
-								<label for="sensitiveCase">Match Case</label>
+								<label for="sensitiveCase">MATCH CASE</label>
 								<input type="checkbox" id="sensitiveCase" />
 							</div>
 							<div class="max-size">
-								<label for="max-size-qntd">Max Num</label>
+								<label for="max-size-qntd">MAX OCCURRENECES</label>
 								<input type="number" id="max-size-qntd" value="200"/>
 							</div>
 						</div>

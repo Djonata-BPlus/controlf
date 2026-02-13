@@ -19,6 +19,15 @@ export default class Search {
         this.createWebView()
         this.initWebView()
         this.registerVsCodeEvents()
+        this.hasServerConfigs()
+    }
+
+    hasServerConfigs()
+    {
+        if (this._storedServers.length === 0) {
+            vscode.window.showWarningMessage('Nenhum servidor de conexão encontrado. Por favor, cadastre ao menos um.');
+            vscode.commands.executeCommand('controlf.abrirConfiguracoes');
+        }
     }
 
     registerVsCodeEvents()
@@ -42,11 +51,6 @@ export default class Search {
     initWebView()
     {
         this._storedServers = getStoredConfigs();
-        if (this._storedServers.length === 0) {
-            vscode.window.showWarningMessage('Nenhum servidor de conexão encontrado. Por favor, cadastre um servidor.');
-            return vscode.commands.executeCommand('controlf.abrirConfiguracoes');
-        }
-        vscode.window.showInformationMessage('Abrindo tela de busca...');
         this._panel.webview.html = new GetWebviewContent(this._storedServers).html;
     }
 
@@ -109,12 +113,17 @@ export default class Search {
 
     async isValidAccess(config)
     {
-        const password = await this.getPassword(config.id);
-        if (!config?.url || (!config?.usuario) || (!password)) {
-            this._panel.webview.postMessage({ comando: 'erro', mensagem: `Credenciais da configuração "${config.nome}" estão incompletas. Verifique as configurações.` });
-            return;
+        try
+        {
+            if (!config?.url) {
+                this._panel.webview.postMessage({ comando: 'erro', mensagem: `Credenciais da configuração "${config.nome}" estão incompletas. Verifique as configurações.` });
+                return false;
+            }
+            return true;
+        }catch(error)
+        {
+            vscode.window.showInformationMessage("Erro ao tentar validar o acesso."+ error);
         }
-
     }
 
     async getSearchURL(message, baseUrl)
@@ -142,6 +151,8 @@ export default class Search {
 
             if (!message?.namespace){
                 vscode.window.showInformationMessage("Obrigatório informar o namespace.");
+                this._panel.webview.postMessage({ comando: 'getNamespaceError'})
+                return;
             }
 
             const url = await this.getSearchURL(message, config.url);
@@ -163,7 +174,8 @@ export default class Search {
 
             const dados = await resposta.json();
             this._panel.webview.postMessage({ comando: 'resultado', dados });
-        } catch (erro) {
+        } catch (erro) 
+        {
             this._panel.webview.postMessage({ comando: 'erro', mensagem: `Erro de conexão ou servidor: ${erro.message}, url de teste foi ${url}` });
         }
     }

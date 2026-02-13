@@ -83,16 +83,19 @@ export default class GetWebViewConfigContent {
     {
         let body = `
             <body>
-            <h1>Configuração de Servidores</h1>
-
-            <div id="profiles-container">
+            <div class="main-config-class">
+                <div>
+                    <h1>Configuração de Servidores</h1>
                 </div>
 
-            <button id="add-profile-btn">Adicionar Novo Servidor</button>
-            <button id="save-all-btn">Salvar Todas as Configurações</button>
+                <div id="profiles-container"></div>
 
-            <p id="status-message" style="color: var(--vscode-terminal-ansiBrightYellow); margin-top: 10px;"></p>
-        `;
+                <button id="add-profile-btn">ADICIONAR SERVIDOR</button>
+                <button id="save-all-btn">SALVAR CONFIGURAÇÕES</button>
+
+                <p id="status-message" style="color: var(--vscode-terminal-ansiBrightYellow); margin-top: 10px;"></p>
+            </div>
+            `;
 
         return (body + this.scripts + `</body></html>`);
     }

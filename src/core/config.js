@@ -2,6 +2,7 @@ import {getStoredConfigs} from '../utils/utils.js';
 import GetWebViewConfigContent from '../web-views/get-webview-server-config.js';
 import * as vscode from 'vscode';
 
+
 export default class Config {
     _command;
     _context;
@@ -65,8 +66,8 @@ export default class Config {
            
             for (const perfil of perfisArray) {
                 if (perfil.senha && perfil.senha.trim() !== '') {
-                    const secretKey = `controlf.senha.${perfil.id}`;
-                    await this._context.secrets.store(secretKey, perfil.senha);
+                const secretKey = `controlf.senha.${perfil.id}`;
+                await this._context.secrets.store(secretKey, perfil.senha);
                 }
 
                 perfisMetaData.push({
