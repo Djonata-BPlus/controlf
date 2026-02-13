@@ -18,4 +18,7 @@
 5. Agora já pode digitar o que deseja buscar, depois é só clicar em "Buscar".
 ![Passo 5](https://github.com/Djonata-BPlus/controlf/blob/main/assets/step-5.png)
 
+6. "Et voilà", sua buscar foi realizada!
+![Passo 6](https://github.com/Djonata-BPlus/controlf/blob/main/assets/step-6.png)
+
 **Desenvolvido por Djonata Hortz**
