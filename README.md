@@ -15,4 +15,7 @@
 4. Devolta a tela de busca, se suas configurações estiverem corretas, o campo "Selecionar Namespaces" deve trazer uma lista dos namespaces existentes naquele servidor.
 ![Passo 4](https://github.com/Djonata-BPlus/controlf/blob/main/assets/step-4.png)
 
+5. Agora já pode digitar o que deseja buscar, depois é só clicar em "Buscar".
+![Passo 5](https://github.com/Djonata-BPlus/controlf/blob/main/assets/step-5.png)
+
 **Desenvolvido por Djonata Hortz**
