@@ -1,9 +1,11 @@
 {
-  "name": "ControlF",
+  "name": "control_f",
   "displayName": "ControlF",
-  "description": "",
-  "version": "0.1.1",
+  "description": "Plugin para auxiliar buscar de strings em fontes de servidores CACHE/IRIS Intersystems.",
+  "publisher": "Djonata N. Hortz",
+  "version": "0.1.2",
   "type": "module",
+  "icon": "assets/icon.png",
   "license": "MIT",
   "engines": {
     "vscode": "^1.100.0"
