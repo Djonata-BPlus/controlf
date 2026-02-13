@@ -9,4 +9,10 @@
 2. Na primeira vez que tentar acessar a tela de busca ele vai redirecionar para a configuração de servidores, e lá, você deve adicionar um servidor para poder começar suas buscas.
 ![Passo 2](https://github.com/Djonata-BPlus/controlf/blob/main/assets/step-2.png)
 
+3. Depois de preencher corretamente os campos, apenas clique em "Salvar Configurações".
+![Passo 3](https://github.com/Djonata-BPlus/controlf/blob/main/assets/step-3.png)
+
+4. Devolta a tela de busca, se suas configurações estiverem corretas, o campo selecionar namespaces deve trazer uma lista dos namespaces existentes naquele servidor.
+![Passo 4](https://github.com/Djonata-BPlus/controlf/blob/main/assets/step-4.png)
+
 **Desenvolvido por Djonata Hortz**
