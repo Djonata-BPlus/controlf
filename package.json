@@ -3,7 +3,7 @@
   "displayName": "ControlF",
   "description": "Plugin para auxiliar buscar de strings em fontes de servidores CACHE/IRIS Intersystems.",
   "publisher": "DjonataNHortz",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "icon": "assets/icon.png",
   "license": "MIT",
@@ -52,7 +52,7 @@
     "lint": "eslint .",
     "pretest": "npm run lint",
     "test": "vscode-test",
-    "build": "npx vsce package"
+    "build": "npx vsce package --baseImagesUrl https://raw.githubusercontent.com/Djonata-BPlus/controlf/refs/heads/main/"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
