@@ -39,7 +39,7 @@ export default class Search {
                     this.getNameSpaces(message?.servidorId);
                     break;
                 case 'buscar':
-                    this.buscar(message, this._panel, this._context);
+                    this.search(message, this._panel, this._context);
                     break;
                 case 'configuracoes':
                     vscode.commands.executeCommand('controlf.abrirConfiguracoes');
@@ -139,9 +139,16 @@ export default class Search {
         return `${baseUrl}/api/atelier/v2/${params.namespace}/action/search?query=${params.stringBusca}&documents=${encodeURIComponent(params.tipoArquivo)}&case=${params.sensitiveCase}&regex=0&gen=${params.searchInGenFilesToo}&max=${params.maxSize}`;
     }
 
-    async buscar(message)
+    async search(message)
     {
         try {
+            //teste para conseguir abrir uma classe apenas clicando com segundo botão, na verdade 
+            //se pode dar um clique para abrir onde a busca foi feita, pois ela é uma configuração que
+            //está funcionando, e faz sentido abrir onde se esta buscando.
+            
+            vscode.window.showTextDocument(
+                "C:\\Users\\djonata.hortz\\Desktop\\MyProjects\\contolf\\src\\core\\config.js"
+            );
             const serverId = message.servidorId;
             this._storedServers = getStoredConfigs();
             if (!this.isValidConfigServer(serverId)) return;
@@ -158,7 +165,7 @@ export default class Search {
             const url = await this.getSearchURL(message, config.url);
             const password = await this.getPassword(config?.id);
             const base64Credentials = Buffer.from(`${config.usuario}:${password}`).toString('base64');
-    
+            
             const resposta = await fetch(url, {
                 method: 'GET',
                 headers: {
